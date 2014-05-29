@@ -1,0 +1,22 @@
+.container {
+  display: block !important;
+  max-width: 530px !important;
+  margin: 0 auto !important; 
+  clear: both !important;
+}
+
+.content {
+  padding: 30px;
+  max-width: 530px;
+  margin: 0 auto;
+  display: block; 
+
+  table { 
+    width: 100%; 
+  }
+}
+
+.clear { 
+  display: block; 
+  clear: both; 
+}
