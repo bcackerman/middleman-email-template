@@ -68,6 +68,35 @@ activate :livereload
 #   end
 # end
 
+
+module PreMailer
+  class << self
+    def registered(app)
+      require "premailer"
+      app.after_build do |builder|
+        prefix = build_dir + File::SEPARATOR
+        Dir.chdir(build_dir) do
+          Dir.glob('**/*.html') do |file|
+            premailer = Premailer.new(file, :warn_level => Premailer::Warnings::SAFE, :adapter => :nokogiri, :preserve_styles => true, :remove_comments => true, :remove_ids => true)
+            fileout = File.open(file, "w")
+            fileout.puts premailer.to_inline_css
+            fileout.close
+            premailer.warnings.each do |w|
+              builder.say_status :premailer, "#{w[:message]} (#{w[:level]}) may not render properly in #{w[:clients]}"
+            end
+            builder.say_status :premailer, prefix+file
+          end
+        end
+      end
+    end
+    alias :included :registered
+  end
+end
+
+::Middleman::Extensions.register(:inline_premailer, PreMailer)
+
+activate :inline_premailer
+
 set :css_dir, 'stylesheets'
 
 set :js_dir, 'javascripts'
